@@ -1,0 +1,155 @@
+
+
+================================================================
+== Vivado HLS Report for 'pwm_prepare'
+================================================================
+* Date:           Sun Sep 18 14:32:51 2016
+
+* Version:        2016.2 (Build 1577090 on Thu Jun 02 16:59:10 MDT 2016)
+* Project:        pwm_prepare
+* Solution:       solution1
+* Product family: artix7
+* Target device:  xc7a100tcsg324-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing (ns): 
+    * Summary: 
+    +--------+-------+----------+------------+
+    |  Clock | Target| Estimated| Uncertainty|
+    +--------+-------+----------+------------+
+    |ap_clk  |  10.00|      5.61|        1.25|
+    +--------+-------+----------+------------+
+
++ Latency (clock cycles): 
+    * Summary: 
+    +-----+-----+-----+-----+---------+
+    |  Latency  |  Interval | Pipeline|
+    | min | max | min | max |   Type  |
+    +-----+-----+-----+-----+---------+
+    |    0|    0|    1|    1|   none  |
+    +-----+-----+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-------+--------+-------+
+|       Name      | BRAM_18K| DSP48E|   FF   |  LUT  |
++-----------------+---------+-------+--------+-------+
+|DSP              |        -|      -|       -|      -|
+|Expression       |        -|      -|       0|    145|
+|FIFO             |        -|      -|       -|      -|
+|Instance         |        0|      -|     119|    170|
+|Memory           |        -|      -|       -|      -|
+|Multiplexer      |        -|      -|       -|      3|
+|Register         |        -|      -|       2|      -|
++-----------------+---------+-------+--------+-------+
+|Total            |        0|      0|     121|    318|
++-----------------+---------+-------+--------+-------+
+|Available        |      270|    240|  126800|  63400|
++-----------------+---------+-------+--------+-------+
+|Utilization (%)  |        0|      0|   ~0   |   ~0  |
++-----------------+---------+-------+--------+-------+
+
++ Detail: 
+    * Instance: 
+    +----------------------------------+--------------------------------+---------+-------+-----+-----+
+    |             Instance             |             Module             | BRAM_18K| DSP48E|  FF | LUT |
+    +----------------------------------+--------------------------------+---------+-------+-----+-----+
+    |pwm_prepare_control_axil_s_axi_U  |pwm_prepare_control_axil_s_axi  |        0|      0|  119|  170|
+    +----------------------------------+--------------------------------+---------+-------+-----+-----+
+    |Total                             |                                |        0|      0|  119|  170|
+    +----------------------------------+--------------------------------+---------+-------+-----+-----+
+
+    * DSP48: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +-------------------+----------+-------+---+----+------------+------------+
+    |   Variable Name   | Operation| DSP48E| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +-------------------+----------+-------+---+----+------------+------------+
+    |tmp_2_fu_83_p2     |     +    |      0|  0|  32|          32|          32|
+    |ap_sig_123         |    and   |      0|  0|   1|           1|           1|
+    |tmp_1_fu_77_p2     |   ashr   |      0|  0|  95|          32|          32|
+    |ap_sig_76          |    or    |      0|  0|   1|           1|           1|
+    |output_axis_TDATA  |  select  |      0|  0|  16|           1|          16|
+    +-------------------+----------+-------+---+----+------------+------------+
+    |Total              |          |      0|  0| 145|          67|          82|
+    +-------------------+----------+-------+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-----------------------------------+----+-----------+-----+-----------+
+    |                Name               | LUT| Input Size| Bits| Total Bits|
+    +-----------------------------------+----+-----------+-----+-----------+
+    |ap_sig_ioackin_output_axis_TREADY  |   1|          2|    1|          2|
+    |input_axis_TDATA_blk_n             |   1|          2|    1|          2|
+    |output_axis_TDATA_blk_n            |   1|          2|    1|          2|
+    +-----------------------------------+----+-----------+-----+-----------+
+    |Total                              |   3|          6|    3|          6|
+    +-----------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-----------------------------------+---+----+-----+-----------+
+    |                Name               | FF| LUT| Bits| Const Bits|
+    +-----------------------------------+---+----+-----+-----------+
+    |ap_CS_fsm                          |  1|   0|    1|          0|
+    |ap_reg_ioackin_output_axis_TREADY  |  1|   0|    1|          0|
+    +-----------------------------------+---+----+-----+-----------+
+    |Total                              |  2|   0|    2|          0|
+    +-----------------------------------+---+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------------------+-----+-----+------------+--------------+--------------+
+|          RTL Ports         | Dir | Bits|  Protocol  | Source Object|    C Type    |
++----------------------------+-----+-----+------------+--------------+--------------+
+|s_axi_control_axil_AWVALID  |  in |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_AWREADY  | out |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_AWADDR   |  in |    6|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_WVALID   |  in |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_WREADY   | out |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_WDATA    |  in |   32|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_WSTRB    |  in |    4|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_ARVALID  |  in |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_ARREADY  | out |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_ARADDR   |  in |    6|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_RVALID   | out |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_RREADY   |  in |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_RDATA    | out |   32|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_RRESP    | out |    2|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_BVALID   | out |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_BREADY   |  in |    1|    s_axi   | control_axil |    pointer   |
+|s_axi_control_axil_BRESP    | out |    2|    s_axi   | control_axil |    pointer   |
+|ap_clk                      |  in |    1| ap_ctrl_hs |  pwm_prepare | return value |
+|ap_rst_n                    |  in |    1| ap_ctrl_hs |  pwm_prepare | return value |
+|interrupt                   | out |    1| ap_ctrl_hs |  pwm_prepare | return value |
+|input_axis_TDATA            |  in |   16|    axis    |  input_axis  |    scalar    |
+|input_axis_TVALID           |  in |    1|    axis    |  input_axis  |    scalar    |
+|input_axis_TREADY           | out |    1|    axis    |  input_axis  |    scalar    |
+|output_axis_TDATA           | out |   16|    axis    |  output_axis |    pointer   |
+|output_axis_TVALID          | out |    1|    axis    |  output_axis |    pointer   |
+|output_axis_TREADY          |  in |    1|    axis    |  output_axis |    pointer   |
++----------------------------+-----+-----+------------+--------------+--------------+
+

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Product Version: Vivado v2016.2 (64-bit)              -->
+<!--                                                         -->
+<!-- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.   -->
+
+<Project Version="7" Minor="14" Path="/opt/Xilinx/Projects/scatter_dma/scatter_dma.xpr">
+  <DefaultLaunch Dir="$PRUNDIR"/>
+  <Configuration>
+    <Option Name="Id" Val="0b373b00e480426c944da486d94cb0ca"/>
+    <Option Name="Part" Val="xc7a100tcsg324-1"/>
+    <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
+    <Option Name="CompiledLibDirXSim" Val=""/>
+    <Option Name="CompiledLibDirModelSim" Val="$PCACHEDIR/compile_simlib/modelsim"/>
+    <Option Name="CompiledLibDirQuesta" Val="$PCACHEDIR/compile_simlib/questa"/>
+    <Option Name="CompiledLibDirIES" Val="$PCACHEDIR/compile_simlib/ies"/>
+    <Option Name="CompiledLibDirVCS" Val="$PCACHEDIR/compile_simlib/vcs"/>
+    <Option Name="CompiledLibDirRiviera" Val="$PCACHEDIR/compile_simlib/riviera"/>
+    <Option Name="CompiledLibDirActivehdl" Val="$PCACHEDIR/compile_simlib/activehdl"/>
+    <Option Name="TargetLanguage" Val="VHDL"/>
+    <Option Name="BoardPart" Val=""/>
+    <Option Name="ActiveSimSet" Val="sim_1"/>
+    <Option Name="DefaultLib" Val="xil_defaultlib"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/ip_repo/spkr_periph_ctrl_axis_1.0"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/ip_repo/spkr_periph_ctrl_1.0"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/pwm_prepare/solution1/impl/ip"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/awgn/solution1/impl/ip"/>
+    <Option Name="EnableCoreContainer" Val="FALSE"/>
+    <Option Name="XPMLibraries" Val="XPM_CDC"/>
+    <Option Name="XPMLibraries" Val="XPM_MEMORY"/>
+    <Option Name="CreateRefXciForCoreContainers" Val="FALSE"/>
+    <Option Name="IPUserFilesDir" Val="$PPRDIR/scatter_dma.ip_user_files"/>
+    <Option Name="IPStaticSourceDir" Val="$PPRDIR/scatter_dma.ip_user_files/ipstatic"/>
+    <Option Name="EnableBDX" Val="FALSE"/>
+    <Option Name="WTXSimLaunchSim" Val="0"/>
+    <Option Name="WTModelSimLaunchSim" Val="0"/>
+    <Option Name="WTQuestaLaunchSim" Val="0"/>
+    <Option Name="WTIesLaunchSim" Val="0"/>
+    <Option Name="WTVcsLaunchSim" Val="0"/>
+    <Option Name="WTRivieraLaunchSim" Val="0"/>
+    <Option Name="WTActivehdlLaunchSim" Val="0"/>
+    <Option Name="WTXSimExportSim" Val="5"/>
+    <Option Name="WTModelSimExportSim" Val="5"/>
+    <Option Name="WTQuestaExportSim" Val="5"/>
+    <Option Name="WTIesExportSim" Val="5"/>
+    <Option Name="WTVcsExportSim" Val="5"/>
+    <Option Name="WTRivieraExportSim" Val="5"/>
+    <Option Name="WTActivehdlExportSim" Val="5"/>
+  </Configuration>
+  <FileSets Version="1" Minor="31">
+    <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
+      <Filter Type="Srcs"/>
+      <File Path="$PSRCDIR/sources_1/bd/block_design/block_design.bd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="hdl/block_design.hwdef"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="hw_handoff/block_design_bd.tcl"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="hw_handoff/block_design.hwh"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="block_design_ooc.xdc"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="block_design.bmm"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_ss_u_1/block_design_auto_ss_u_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_ss_slidr_1/block_design_auto_ss_slidr_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_ss_k_1/block_design_auto_ss_k_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_ss_u_0/block_design_auto_ss_u_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_ss_slidr_0/block_design_auto_ss_slidr_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_ss_k_0/block_design_auto_ss_k_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_us_df_4/block_design_auto_us_df_4.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_us_df_3/block_design_auto_us_df_3.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_us_df_2/block_design_auto_us_df_2.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_us_df_1/block_design_auto_us_df_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_us_df_0/block_design_auto_us_df_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_auto_cc_0/block_design_auto_cc_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_s00_data_fifo_0/block_design_s00_data_fifo_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_axi_gpio_0_0/block_design_axi_gpio_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_awgn_0_0/block_design_awgn_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_xlconstant_0_1/block_design_xlconstant_0_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_xlconstant_0_0/block_design_xlconstant_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_pwm_prepare_0_0/block_design_pwm_prepare_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_spkr_periph_ctrl_axis_0_0/block_design_spkr_periph_ctrl_axis_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_xbar_0/block_design_xbar_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_axis_interconnect_0_0/block_design_axis_interconnect_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_lmb_bram_1/block_design_lmb_bram_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_xbar_3/block_design_xbar_3.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_xbar_2/block_design_xbar_2.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_axi_dma_0_0/block_design_axi_dma_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_cordic_0_0/block_design_cordic_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="hdl/block_design.vhd"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_rst_mig_7series_0_83M_0/block_design_rst_mig_7series_0_83M_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_axi_mem_intercon_0/block_design_axi_mem_intercon_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_mig_7series_0_1/block_design_mig_7series_0_1.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_axi_uartlite_0_0/block_design_axi_uartlite_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_rst_clk_wiz_1_100M_0/block_design_rst_clk_wiz_1_100M_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_clk_wiz_1_0/block_design_clk_wiz_1_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_mdm_1_0/block_design_mdm_1_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_microblaze_0_xlconcat_0/block_design_microblaze_0_xlconcat_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_microblaze_0_axi_intc_0/block_design_microblaze_0_axi_intc_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_microblaze_0_axi_periph_0/block_design_microblaze_0_axi_periph_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_ilmb_bram_if_cntlr_0/block_design_ilmb_bram_if_cntlr_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_dlmb_bram_if_cntlr_0/block_design_dlmb_bram_if_cntlr_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_ilmb_v10_0/block_design_ilmb_v10_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_dlmb_v10_0/block_design_dlmb_v10_0.xci"/>
+        <CompFileExtendedInfo CompFileName="block_design.bd" FileRelPathName="ip/block_design_microblaze_0_0/block_design_microblaze_0_0.xci"/>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/block_design/hdl/block_design_wrapper.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/block_design/ip/block_design_mig_7series_0_0/mig_a.prj">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/block_design/ip/block_design_mig_7series_0_1/mig_a.prj">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/block_design/ip/block_design_mig_7series_0_1/mig_b.prj">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSDKDIR/mb_app_0/Debug/mb_app_0.elf">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="ScopedToRef" Val="block_design"/>
+          <Attr Name="ScopedToCell" Val="microblaze_0"/>
+          <Attr Name="IsVisible" Val="1"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="DesignMode" Val="RTL"/>
+        <Option Name="TopModule" Val="block_design_wrapper"/>
+        <Option Name="TopAutoSet" Val="TRUE"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+      <Filter Type="Constrs"/>
+      <File Path="$PSRCDIR/constrs_1/imports/Projects/Nexys4DDR_Master.xdc">
+        <FileInfo>
+          <Attr Name="ImportPath" Val="$PPRDIR/../Nexys4DDR_Master.xdc"/>
+          <Attr Name="ImportTime" Val="1418246284"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/constrs_1/new/moar_constraints.xdc">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/new/moar_constraints.xdc"/>
+        <Option Name="ConstrsType" Val="XDC"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1">
+      <Filter Type="Srcs"/>
+      <File Path="$PSDKDIR/mb_app_0/Debug/mb_app_0.elf">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="simulation"/>
+          <Attr Name="ScopedToRef" Val="block_design"/>
+          <Attr Name="ScopedToCell" Val="microblaze_0"/>
+          <Attr Name="IsVisible" Val="1"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="DesignMode" Val="RTL"/>
+        <Option Name="TopModule" Val="block_design_wrapper"/>
+        <Option Name="TopLib" Val="xil_defaultlib"/>
+        <Option Name="TopAutoSet" Val="TRUE"/>
+        <Option Name="TransportPathDelay" Val="0"/>
+        <Option Name="TransportIntDelay" Val="0"/>
+        <Option Name="SrcSet" Val="sources_1"/>
+      </Config>
+    </FileSet>
+  </FileSets>
+  <Simulators>
+    <Simulator Name="XSim">
+      <Option Name="Description" Val="Vivado Simulator"/>
+      <Option Name="CompiledLib" Val="0"/>
+    </Simulator>
+    <Simulator Name="ModelSim">
+      <Option Name="Description" Val="ModelSim Simulator"/>
+    </Simulator>
+    <Simulator Name="Questa">
+      <Option Name="Description" Val="Questa Advanced Simulator"/>
+    </Simulator>
+    <Simulator Name="IES">
+      <Option Name="Description" Val="Incisive Enterprise Simulator (IES)"/>
+    </Simulator>
+    <Simulator Name="VCS">
+      <Option Name="Description" Val="Verilog Compiler Simulator (VCS)"/>
+    </Simulator>
+    <Simulator Name="Riviera">
+      <Option Name="Description" Val="Riviera-PRO Simulator"/>
+    </Simulator>
+  </Simulators>
+  <Runs Version="1" Minor="10">
+    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a100tcsg324-1" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" State="current" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+    </Run>
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a100tcsg324-1" ConstrsSet="constrs_1" Description="Default settings for Implementation." State="current" SynthRun="synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream">
+          <Option Id="BinFile">1</Option>
+        </Step>
+      </Strategy>
+    </Run>
+  </Runs>
+</Project>

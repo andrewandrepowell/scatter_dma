@@ -1,0 +1,21 @@
+01:48:56 **** Auto Build of configuration Debug for project mb_app_0_bsp_xintc_example_1 ****
+make all 
+Building file: ../src/xintc_example.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/xintc_example.o" -I../../mb_app_0_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/xintc_example.d" -MT"src/xintc_example.o" -o "src/xintc_example.o" "../src/xintc_example.c"
+Finished building: ../src/xintc_example.c
+ 
+Building target: mb_app_0_bsp_xintc_example_1.elf
+Invoking: MicroBlaze gcc linker
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../mb_app_0_bsp/microblaze_0/lib -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -o "mb_app_0_bsp_xintc_example_1.elf"  ./src/xintc_example.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+Finished building target: mb_app_0_bsp_xintc_example_1.elf
+ 
+Invoking: MicroBlaze Print Size
+mb-size mb_app_0_bsp_xintc_example_1.elf  |tee "mb_app_0_bsp_xintc_example_1.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+   7740	    344	   3276	  11360	   2c60	mb_app_0_bsp_xintc_example_1.elf
+Finished building: mb_app_0_bsp_xintc_example_1.elf.size
+ 
+
+01:48:56 Build Finished (took 175ms)
+

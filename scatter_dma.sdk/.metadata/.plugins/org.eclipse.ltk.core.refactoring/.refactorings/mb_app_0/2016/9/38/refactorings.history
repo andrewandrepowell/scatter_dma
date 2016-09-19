@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;mb_app_0/src/spkr_periph_ctrl&apos; to &apos;spkr_periph_ctrl.h&apos;" description="Rename resource &apos;spkr_periph_ctrl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/spkr_periph_ctrl" name="spkr_periph_ctrl.h" stamp="1474027150931" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;mb_app_0/src/spkr_periph_ctrl.h&apos; to &apos;speaker.h&apos;" description="Rename resource &apos;spkr_periph_ctrl.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/spkr_periph_ctrl.h" name="speaker.h" stamp="1474027262950" updateReferences="true"/>
+</session>

@@ -1,0 +1,16 @@
+09:21:23 **** Auto Build of configuration Debug for project mb_app_1 ****
+make all 
+Building file: ../src/main.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O2 -c -fmessage-length=0 -MT"src/main.o" -I../../mb_app_1_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+Finished building: ../src/main.c
+ 
+Building file: ../src/speaker.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O2 -c -fmessage-length=0 -MT"src/speaker.o" -I../../mb_app_1_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/speaker.d" -MT"src/speaker.o" -o "src/speaker.o" "../src/speaker.c"
+Finished building: ../src/speaker.c
+ 
+make: *** No rule to make target '../src/lscript.ld', needed by 'mb_app_1.elf'.  Stop.
+
+09:21:23 Build Finished (took 244ms)
+

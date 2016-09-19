@@ -1,0 +1,44 @@
+01:48:55 **** Auto Build of configuration Debug for project mb_app_0_bsp_xaxidma_example_sg_intr_1 ****
+make all 
+Building file: ../src/xaxidma_example_sg_intr.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/xaxidma_example_sg_intr.o" -I../../mb_app_0_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/xaxidma_example_sg_intr.d" -MT"src/xaxidma_example_sg_intr.o" -o "src/xaxidma_example_sg_intr.o" "../src/xaxidma_example_sg_intr.c"
+Finished building: ../src/xaxidma_example_sg_intr.c
+ 
+Building file: ../src/xaxidma_multichan_sg_intr.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/xaxidma_multichan_sg_intr.o" -I../../mb_app_0_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/xaxidma_multichan_sg_intr.d" -MT"src/xaxidma_multichan_sg_intr.o" -o "src/xaxidma_multichan_sg_intr.o" "../src/xaxidma_multichan_sg_intr.c"
+Finished building: ../src/xaxidma_multichan_sg_intr.c
+ 
+Building file: ../src/xaxidma_poll_multi_pkts.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/xaxidma_poll_multi_pkts.o" -I../../mb_app_0_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/xaxidma_poll_multi_pkts.d" -MT"src/xaxidma_poll_multi_pkts.o" -o "src/xaxidma_poll_multi_pkts.o" "../src/xaxidma_poll_multi_pkts.c"
+../src/xaxidma_poll_multi_pkts.c: In function 'RxSetup':
+../src/xaxidma_poll_multi_pkts.c:372:12: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
+   BdCurPtr = XAxiDma_BdRingNext(RxRingPtr, BdCurPtr);
+            ^
+../src/xaxidma_poll_multi_pkts.c: In function 'SendPackets':
+../src/xaxidma_poll_multi_pkts.c:558:12: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
+   CurBdPtr = XAxiDma_BdRingNext(TxRingPtr, CurBdPtr);
+            ^
+Finished building: ../src/xaxidma_poll_multi_pkts.c
+ 
+Building target: mb_app_0_bsp_xaxidma_example_sg_intr_1.elf
+Invoking: MicroBlaze gcc linker
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../mb_app_0_bsp/microblaze_0/lib -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -o "mb_app_0_bsp_xaxidma_example_sg_intr_1.elf"  ./src/xaxidma_example_sg_intr.o ./src/xaxidma_multichan_sg_intr.o ./src/xaxidma_poll_multi_pkts.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+./src/xaxidma_multichan_sg_intr.o:(.data+0x0): multiple definition of `Packet'
+./src/xaxidma_example_sg_intr.o:(.data+0x0): first defined here
+./src/xaxidma_multichan_sg_intr.o: In function `main':
+/opt/Xilinx/Projects/scatter_dma/scatter_dma.sdk/mb_app_0_bsp_xaxidma_example_sg_intr_1/Debug/../src/xaxidma_multichan_sg_intr.c:292: multiple definition of `main'
+./src/xaxidma_example_sg_intr.o:/opt/Xilinx/Projects/scatter_dma/scatter_dma.sdk/mb_app_0_bsp_xaxidma_example_sg_intr_1/Debug/../src/xaxidma_example_sg_intr.c:264: first defined here
+./src/xaxidma_poll_multi_pkts.o:(.data+0x0): multiple definition of `Packet'
+./src/xaxidma_example_sg_intr.o:(.data+0x0): first defined here
+./src/xaxidma_poll_multi_pkts.o: In function `main':
+/opt/Xilinx/Projects/scatter_dma/scatter_dma.sdk/mb_app_0_bsp_xaxidma_example_sg_intr_1/Debug/../src/xaxidma_poll_multi_pkts.c:178: multiple definition of `main'
+./src/xaxidma_example_sg_intr.o:/opt/Xilinx/Projects/scatter_dma/scatter_dma.sdk/mb_app_0_bsp_xaxidma_example_sg_intr_1/Debug/../src/xaxidma_example_sg_intr.c:264: first defined here
+makefile:36: recipe for target 'mb_app_0_bsp_xaxidma_example_sg_intr_1.elf' failed
+collect2: error: ld returned 1 exit status
+make: *** [mb_app_0_bsp_xaxidma_example_sg_intr_1.elf] Error 1
+
+01:48:56 Build Finished (took 312ms)
+

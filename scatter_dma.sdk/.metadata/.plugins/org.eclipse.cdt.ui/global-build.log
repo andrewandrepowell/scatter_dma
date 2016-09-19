@@ -1,0 +1,21 @@
+09:35:11 **** Incremental Build of configuration Debug for project mb_app_0 ****
+make all 
+make: Nothing to be done for 'all'.
+09:40:22 **** Auto Build of configuration Debug for project mb_app_0 ****
+make all 
+Building file: ../src/main.c
+Invoking: MicroBlaze gcc compiler
+mb-gcc -Wall -O2 -c -fmessage-length=0 -MT"src/main.o" -I../../mb_app_0_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+Finished building: ../src/main.c
+ 
+Building target: mb_app_0.elf
+Invoking: MicroBlaze gcc linker
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../mb_app_0_bsp/microblaze_0/lib -mlittle-endian -mcpu=v9.6 -mxl-soft-mul -Wl,--no-relax -o "mb_app_0.elf"  ./src/main.o ./src/speaker.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+Finished building target: mb_app_0.elf
+ 
+Invoking: MicroBlaze Print Size
+mb-size mb_app_0.elf  |tee "mb_app_0.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  34476	   1060	  11216	  46752	   b6a0	mb_app_0.elf
+Finished building: mb_app_0.elf.size
+ 

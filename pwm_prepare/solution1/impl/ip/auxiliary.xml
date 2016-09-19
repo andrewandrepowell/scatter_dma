@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xd:acceleratorMap xmlns:xd="http://www.xilinx.com/xidane" xd:functionName="pwm_prepare" xd:componentRef="pwm_prepare" xd:initiationInterval="1" xd:clockPeriod="10.000000" xd:sequential="true" xd:hostMachine="64" xd:reset="control">
+  <xd:controlReg xd:name="control" xd:interfaceRef="s_axi_control_axil" xd:busTypeRef="axilite" xd:type="generic_axi_lite" xd:offset="0x0"/>
+  <xd:arg xd:name="in_data" xd:originalName="in_data" xd:direction="in" xd:interfaceRef="input_axis" xd:busTypeRef="axis" xd:dataWidth="16"/>
+  <xd:arg xd:name="*(out_data)" xd:originalName="out_data" xd:direction="out" xd:interfaceRef="output_axis" xd:busTypeRef="axis" xd:dataWidth="16"/>
+  <xd:arg xd:name="*(shift_val)" xd:originalName="shift_val" xd:direction="in" xd:interfaceRef="s_axi_control_axil" xd:busTypeRef="axilite" xd:offset="0x10" xd:handshakeRef="ap_none" xd:dataWidth="32"/>
+  <xd:arg xd:name="*(sum_val)" xd:originalName="sum_val" xd:direction="in" xd:interfaceRef="s_axi_control_axil" xd:busTypeRef="axilite" xd:offset="0x18" xd:handshakeRef="ap_none" xd:dataWidth="32"/>
+  <xd:arg xd:name="*(enable_flag)" xd:originalName="enable_flag" xd:direction="in" xd:interfaceRef="s_axi_control_axil" xd:busTypeRef="axilite" xd:offset="0x20" xd:handshakeRef="ap_none" xd:dataWidth="1"/>
+  <xd:latencyEstimates xd:best-case="0" xd:worst-case="0" xd:average-case="0"/>
+  <xd:resourceEstimates xd:LUT="318" xd:FF="121" xd:BRAM="0" xd:DSP="0"/>
+</xd:acceleratorMap>

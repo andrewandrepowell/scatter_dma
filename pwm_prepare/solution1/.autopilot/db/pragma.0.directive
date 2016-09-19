@@ -1,0 +1,46 @@
+<AutoPilot:ProjectResources xmlns:AutoPilot="com.autoesl.autopilot.ui.directiveView">
+<sourceFile name="">
+<directive functionLabel="" functionName="pwm_prepare" label="">
+<pragma name="INTERFACE">
+<option name="axis" positionalBoolean="mode" value=""/>
+<option name="port" positionalBoolean="4" value="in_data"/>
+<option name="bundle" value="input_axis"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="pwm_prepare" label="">
+<pragma name="INTERFACE">
+<option name="axis" positionalBoolean="mode" value=""/>
+<option name="port" positionalBoolean="4" value="out_data"/>
+<option name="bundle" value="output_axis"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="pwm_prepare" label="">
+<pragma name="INTERFACE">
+<option name="s_axilite" positionalBoolean="mode" value=""/>
+<option name="port" positionalBoolean="4" value="shift_val"/>
+<option name="bundle" value="control_axil"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="pwm_prepare" label="">
+<pragma name="INTERFACE">
+<option name="s_axilite" positionalBoolean="mode" value=""/>
+<option name="port" positionalBoolean="4" value="sum_val"/>
+<option name="bundle" value="control_axil"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="pwm_prepare" label="">
+<pragma name="INTERFACE">
+<option name="s_axilite" positionalBoolean="mode" value=""/>
+<option name="port" positionalBoolean="4" value="enable_flag"/>
+<option name="bundle" value="control_axil"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="pwm_prepare" label="">
+<pragma name="INTERFACE">
+<option name="s_axilite" positionalBoolean="mode" value=""/>
+<option name="port" positionalBoolean="4" value="return"/>
+<option name="bundle" value="control_axil"/>
+</pragma>
+</directive>
+</sourceFile>
+</AutoPilot:ProjectResources>

@@ -1,0 +1,542 @@
+/*
+ * main.c
+ *
+ *  Created on: Sep 10, 2016
+ *      Author: andrewandrepowell2
+ */
+
+#include <stdbool.h>
+#include <math.h>
+#include <string.h>
+#include "xparameters.h"
+#include "xil_printf.h"
+#include "xil_assert.h"
+#include "xintc.h"
+#include "xaxidma.h"
+#include "xil_cache.h"
+#include "xil_exception.h"
+#include "mb_interface.h"
+#include "xil_io.h"
+#include "xpwm_prepare.h"
+#include "xawgn.h"
+#include "xgpio.h"
+
+#define INTC_DEVICE_ID					( XPAR_MICROBLAZE_0_AXI_INTC_DEVICE_ID )
+#define DMA_DEVICE_ID					( XPAR_AXIDMA_0_DEVICE_ID )
+#define DMA_TX_BDRING_ADDR				( 0x80020000 )
+#define DMA_RX_BDRING_ADDR				( 0x80030000 )
+#define DMA_BD_PER_RING_TOTAL			( 10 )
+#define DMA_INT_BD_TOTAL				( 5 )
+#define DMA_ARCACHE 					( 0x3 )		/* Cache type */
+#define DMA_ARUSER 						( 0x0 )		/* Sideband signals */
+#define DMA_TUSER						( 0x0 )
+#define DMA_VSIZE						( 0x1 )		/* Vsize */
+#define DMA_TX_STRIDE					( sizeof( tx_type ) )		/* Stride control */
+#define DMA_RX_STRIDE					( sizeof( rx_type ) )		/* Stride control */
+#define DMA_DMA_TO_DEVICE_INT_ID		( XPAR_INTC_0_AXIDMA_0_MM2S_INTROUT_VEC_ID )
+#define DMA_DEVICE_TO_DMA_INT_ID		( XPAR_INTC_0_AXIDMA_0_S2MM_INTROUT_VEC_ID )
+#define SPEAKER_CLOCK_HZ				( 100000000 )
+#define SPEAKER_COUNTER_WIDTH			( 10 )
+#define SPEAKER_SAMPLE_RATE				( SPEAKER_CLOCK_HZ / ( 1<<SPEAKER_COUNTER_WIDTH ) )
+#define CORDIC_SIN_TDEST				( 0x00 )
+#define CORDIC_SIN_FREQ_0				( 2000 )
+#define CORDIC_SIN_IN_Q_INT				( 3 )
+#define CORDIC_SIN_IN_Q_FRC				( 13 )
+#define CORDIC_SIN_OUT_Q_INT			( 2 )
+#define CORDIC_SIN_OUT_Q_FRC			( 14 )
+#define CORDIC_SIN_ARG_COEF				( 2.0f*M_PI*CORDIC_SIN_FREQ_0/SPEAKER_SAMPLE_RATE*(1<<CORDIC_SIN_IN_Q_FRC) )
+#define CORDIC_SIN_PERIOD_SAMPLES		( SPEAKER_SAMPLE_RATE/CORDIC_SIN_FREQ_0 )
+#define SPEAKER_BASE_ADDR				( XPAR_SPKR_PERIPH_CTRL_0_S00_AXI_BASEADDR )
+#define SPEAKER_TDEST					( 0x01 )
+#define PWM_PREPARE_DEVICE_ID			( XPAR_PWM_PREPARE_0_DEVICE_ID )
+#define AWGN_DEVICE_ID					( XPAR_AWGN_0_DEVICE_ID )
+#define GPIO_USER_DEVICE_ID				( XPAR_AXI_GPIO_0_DEVICE_ID )
+#define GPIO_USER_INT_ID				( XPAR_INTC_0_GPIO_0_VEC_ID )
+#define GPIO_USER_BTND_MASK				( 1<<5 )
+#define GPIO_USER_BTNR_MASK				( 1<<4 )
+#define GPIO_USER_BTNL_MASK				( 1<<3 )
+#define GPIO_USER_BTNU_MASK				( 1<<2 )
+#define GPIO_USER_SW1_MASK				( 1<<1 )
+#define GPIO_USER_SW0_MASK				( 1<<0 )
+#define BUFF_TOTAL						( CORDIC_SIN_PERIOD_SAMPLES )
+#define BUFF_ADDR						( 0x80000000 )
+
+//#if !(CORDIC_SIN_PERIOD_SAMPLES<BUFF_TOTAL)
+//#error "Buffer is not large enough!"
+//#endif
+
+XIntc intc_obj;
+XAxiDma dma_obj;
+XPwm_prepare prepare_obj;
+XAwgn awgn_obj;
+XGpio user_obj;
+
+typedef volatile u16 __attribute__ ((aligned(0x100))) ( *tx_type ) [ BUFF_TOTAL ];
+
+tx_type tx_buff = BUFF_ADDR;
+volatile u32 __attribute__ ((aligned(0x100))) rx_buff [ BUFF_TOTAL ];
+volatile s16 __attribute__ ((aligned(0x100))) sin_buff[ BUFF_TOTAL ];
+volatile bool device2dma_isready;
+volatile bool dma2device_isready;
+volatile bool user_isready;
+
+void Xil_AssertCallbackDef( const char8 *File, s32 Line );
+void dma_dma2device_isr( void* param );
+void dma_device2dma_isr( void* param );
+void gpio_user_isr( void* param );
+
+int main()
+{
+	/* Configure assertion callback. */
+	xil_printf( "Configuring assertion callback function...\n\r" );
+	Xil_AssertSetCallback( Xil_AssertCallbackDef );
+
+	/* Configure interrupt controller core. */
+	xil_printf( "Configuring interrupt controller...\n\r" );
+	{
+		int Status;
+
+		/* Configure interrupt controller core. */
+		Status = XIntc_Initialize( &intc_obj, INTC_DEVICE_ID );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+		/* Associate core with Microblaze's interrupt vector table. */
+		microblaze_register_handler( ( XInterruptHandler ) XIntc_InterruptHandler, ( void* ) &intc_obj );
+		microblaze_enable_interrupts();
+	}
+
+	/* Configure DMA is scatter gather mode of operation. */
+	xil_printf( "Configuring DMA in multi-channel scatter gather mode...\n\r" );
+	{
+		int Status;
+		XAxiDma_Config* config;
+
+		/* Configure core. */
+		config = XAxiDma_LookupConfig( DMA_DEVICE_ID );
+		Xil_AssertNonvoid( config!=NULL );
+		Status = XAxiDma_CfgInitialize( &dma_obj, config );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+		Status = XAxiDma_HasSg( &dma_obj );
+		Xil_AssertNonvoid( Status==TRUE );
+
+		/* Create RxBdRing. */
+		{
+			XAxiDma_Bd BdTemplate;
+			XAxiDma_BdRing* RxRingPtr;
+			XAxiDma_Bd* BdPtr;
+
+			/* Create and clear RX Buffer Descriptor Ring. */
+			RxRingPtr = XAxiDma_GetRxRing( &dma_obj );
+			XAxiDma_BdRingIntDisable( RxRingPtr, XAXIDMA_IRQ_ALL_MASK );
+			Status = XAxiDma_BdRingCreate( RxRingPtr, ( UINTPTR ) DMA_RX_BDRING_ADDR,
+					( UINTPTR ) DMA_RX_BDRING_ADDR, XAXIDMA_BD_MINIMUM_ALIGNMENT, 1 );
+			XAxiDma_BdClear( &BdTemplate );
+			Status = XAxiDma_BdRingClone( RxRingPtr, &BdTemplate );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+			/* Create and configure the single Bd in Ring. */
+			Status = XAxiDma_BdRingAlloc( RxRingPtr, 1, &BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			XAxiDma_BdClear( BdPtr );
+			Status = XAxiDma_BdSetBufAddr( BdPtr, ( UINTPTR ) rx_buff );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			Status = XAxiDma_BdSetLength( BdPtr, sizeof( rx_buff ), RxRingPtr->MaxTransferLen );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			XAxiDma_BdSetCtrl( BdPtr, 0 );
+			XAxiDma_BdSetId( BdPtr, ( u32 ) rx_buff );
+			XAxiDma_BdSetTUser( BdPtr, DMA_TUSER );
+			XAxiDma_BdSetARCache( BdPtr, DMA_ARCACHE );
+			XAxiDma_BdSetARUser( BdPtr, DMA_ARUSER );
+			XAxiDma_BdSetVSize( BdPtr, DMA_VSIZE );
+			XAxiDma_BdSetStride( BdPtr, sizeof( rx_buff ) );
+			//XAxiDma_DumpBd( BdPtr );
+
+			/* Enable interrupt. */
+			XAxiDma_BdRingIntEnable( RxRingPtr, XAXIDMA_IRQ_IOC_MASK );
+			XAxiDma_BdRingSetCoalesce( RxRingPtr, 1, 0 );
+
+			/* Start the receive channel. */
+			Status = XAxiDma_BdRingStart( RxRingPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+			/* All set! Let's bring the Bds to the BdRing. */
+			Status = XAxiDma_BdRingToHw( RxRingPtr, 1, BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+		}
+
+		/* Create TxBdRing. */
+		{
+			XAxiDma_Bd BdTemplate;
+			XAxiDma_BdRing* TxRingPtr;
+			XAxiDma_Bd* BdPtr;
+
+			/* Create and clear TX Buffer Descriptor Ring. More buffer
+			descriptors are allocated with the TX ring since it will be
+			necessary to continuously send data to the speaker driver. */
+			TxRingPtr = XAxiDma_GetTxRing( &dma_obj );
+			XAxiDma_BdRingIntDisable( TxRingPtr, XAXIDMA_IRQ_ALL_MASK );
+			Status = XAxiDma_BdRingCreate( TxRingPtr, ( UINTPTR ) DMA_TX_BDRING_ADDR,
+					( UINTPTR ) DMA_TX_BDRING_ADDR, XAXIDMA_BD_MINIMUM_ALIGNMENT, DMA_BD_PER_RING_TOTAL );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			XAxiDma_BdClear( &BdTemplate );
+			Status = XAxiDma_BdRingClone( TxRingPtr, &BdTemplate );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+			/* Create and configure the single Bd in Ring. */
+			Status = XAxiDma_BdRingAlloc( TxRingPtr, 1, &BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			XAxiDma_BdClear( BdPtr );
+			Status = XAxiDma_BdSetBufAddr( BdPtr, ( UINTPTR ) tx_buff );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			Status = XAxiDma_BdSetLength( BdPtr, sizeof( tx_buff ), TxRingPtr->MaxTransferLen );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+			XAxiDma_BdSetTDest( BdPtr, CORDIC_SIN_TDEST );
+			XAxiDma_BdSetCtrl( BdPtr, XAXIDMA_BD_CTRL_TXSOF_MASK|XAXIDMA_BD_CTRL_TXEOF_MASK );
+			XAxiDma_BdSetId( BdPtr, ( u32 ) tx_buff );
+			XAxiDma_BdSetTUser( BdPtr, DMA_TUSER );
+			XAxiDma_BdSetARCache( BdPtr, DMA_ARCACHE );
+			XAxiDma_BdSetARUser( BdPtr, DMA_ARUSER );
+			XAxiDma_BdSetVSize( BdPtr, DMA_VSIZE );
+			XAxiDma_BdSetStride( BdPtr, sizeof( tx_buff ) );
+			//XAxiDma_DumpBd( BdPtr );
+
+			/* Enable interrupt. */
+			XAxiDma_BdRingIntEnable( TxRingPtr, XAXIDMA_IRQ_IOC_MASK );
+			XAxiDma_BdRingSetCoalesce( TxRingPtr, 1, 0 );
+
+			/* Start the TX Channel. */
+			Status = XAxiDma_BdRingStart( TxRingPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+			/* Unlike the Rx Channel, we're going to wait until the start of the application
+			to bring the TxBd Ring to the DMA. */
+		}
+
+		/* Associate interrupt service routines with interrupt controller. */
+		Status = XIntc_Connect( &intc_obj, DMA_DMA_TO_DEVICE_INT_ID, dma_dma2device_isr, NULL );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+		XIntc_Enable( &intc_obj, DMA_DMA_TO_DEVICE_INT_ID );
+		Status = XIntc_Connect( &intc_obj, DMA_DEVICE_TO_DMA_INT_ID, dma_device2dma_isr, NULL );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+		XIntc_Enable( &intc_obj, DMA_DEVICE_TO_DMA_INT_ID );
+	}
+
+	/* Configure pwm prepare core. */
+	xil_printf ( "Configuring pwm prepare core...\n\r" );
+	{
+		int Status;
+
+		Status = XPwm_prepare_Initialize( &prepare_obj, PWM_PREPARE_DEVICE_ID );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+		XPwm_prepare_EnableAutoRestart( &prepare_obj );
+		XPwm_prepare_Start( &prepare_obj );
+
+		XPwm_prepare_Set_shift_val( &prepare_obj, ( 16-SPEAKER_COUNTER_WIDTH+2 ) );
+		XPwm_prepare_Set_sum_val( &prepare_obj, ( 1 << (SPEAKER_COUNTER_WIDTH-1) ) );
+	}
+
+	/* Configure addititive white gaussian noise core. */
+	xil_printf( "Configuring core for generating additive white gaussian noise...\n\r" );
+	{
+		int Status;
+
+		Status = XAwgn_Initialize( &awgn_obj, AWGN_DEVICE_ID );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+		XAwgn_EnableAutoRestart( &awgn_obj );
+		XAwgn_Start( &awgn_obj );
+		XAwgn_Set_stdd( &awgn_obj, 1<<11 );
+	}
+
+	/* Configuring GPIO for user input. */
+	xil_printf( "Configuring GPIO for user input...\n\r" );
+	{
+		int Status;
+
+		/* Configure GPIO. */
+		Status = XGpio_Initialize( &user_obj, GPIO_USER_DEVICE_ID );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+		XGpio_SetDataDirection( &user_obj, 1, 0b111111 );
+
+		/* Configure interrupt. */
+		XGpio_InterruptGlobalEnable( &user_obj );
+		XGpio_InterruptEnable( &user_obj, 1 );
+
+		/* Associate interrupt service routines with interrupt controller. */
+		Status = XIntc_Connect( &intc_obj, GPIO_USER_INT_ID, gpio_user_isr, NULL );
+		Xil_AssertNonvoid( Status==XST_SUCCESS );
+		XIntc_Enable( &intc_obj, GPIO_USER_INT_ID );
+		user_isready = true;
+	}
+
+	/* Run main application. */
+	xil_printf( "Starting main application...\n\r" );
+	{
+		/* Start interrupt controller. */
+		xil_printf( "Starting interrupt controller core...\n\r" );
+		{
+			int Status;
+			Status = XIntc_Start( &intc_obj, XIN_REAL_MODE );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+		}
+
+		/* Generate input for cordic. */
+		xil_printf( "Generating input for cordic...\n\r" );
+		{
+			/* For each sample generate the corresponding
+			input for the sinusoidal function. */
+			for ( int each_sample=0; each_sample<BUFF_TOTAL; each_sample++ )
+			{
+				const u32 coef_0 = ( u32 )( CORDIC_SIN_ARG_COEF );
+				u32 val_0 = ( ( coef_0 * ( ( each_sample-(BUFF_TOTAL/2) ) << CORDIC_SIN_IN_Q_FRC ) ) >> CORDIC_SIN_IN_Q_FRC );
+				tx_buff[ each_sample ] = ( u16 ) val_0;
+			}
+
+			/* Need to ensure the cached is flushed to memory. */
+			Xil_DCacheFlushRange( ( UINTPTR ) tx_buff, sizeof( tx_buff ) );
+
+			memset( ( void* ) rx_buff, 0, sizeof( rx_buff ) );
+		}
+
+		/* Run cordic to compute the cosine and sine values. */
+		xil_printf( "Bringing buffer descriptors to DMA and blocking...\n\r" );
+		{
+			int Status;
+			XAxiDma_BdRing* TxRingPtr;
+			XAxiDma_Bd* BdPtr;
+
+			device2dma_isready = false;
+			TxRingPtr = XAxiDma_GetTxRing( &dma_obj );
+			BdPtr = ( XAxiDma_Bd* )DMA_TX_BDRING_ADDR;
+
+			/* Bring phases to cordic. */
+			Status = XAxiDma_BdRingToHw( TxRingPtr, 1, BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+			/* Wait until the cordic is finished. */
+			while ( device2dma_isready == false )
+				continue;
+
+			/* Acquire and free buffer descriptors. */
+			Status = XAxiDma_BdRingFromHw( TxRingPtr, 1, &BdPtr );
+			Xil_AssertNonvoid( Status==1 );
+			Status = XAxiDma_BdRingFree( TxRingPtr, 1, BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+		}
+
+		xil_printf( "Acquiring output from cordic...\n\r" );
+		{
+			Xil_DCacheInvalidateRange( ( UINTPTR ) rx_buff, sizeof( rx_buff ) );
+
+			for ( int each_sample=0; each_sample<BUFF_TOTAL; each_sample++ )
+			{
+				sin_buff[ each_sample ] = ( rx_buff[ each_sample ] & ( 0xffff0000 ) ) >> 16;
+			}
+
+			Xil_DCacheFlushRange( ( UINTPTR ) sin_buff, sizeof( sin_buff ) );
+		}
+
+		xil_printf( "Configuring DMA for speaker controller...\n\r" );
+		{
+			int Status;
+			XAxiDma_BdRing* TxRingPtr;
+			XAxiDma_Bd* BdPtr;
+			XAxiDma_Bd* CurBdPtr;
+
+			/* Allocate buffer descriptors for ring. */
+			TxRingPtr = XAxiDma_GetTxRing( &dma_obj );
+			Status = XAxiDma_BdRingAlloc( TxRingPtr, DMA_BD_PER_RING_TOTAL, &BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+			/* Configure each buffer descriptor. Don't forget that the
+			TXSOF and TXEOF bits dictate what group of buffer descriptors
+			represent a packet. In this case, each buffer descriptor is
+			its own packet since every buffer descriptor is configured with
+			both the TXSOF and TXEOF bits. */
+			CurBdPtr = BdPtr;
+			for ( int each_bd=0; each_bd<DMA_BD_PER_RING_TOTAL; each_bd++ )
+			{
+				XAxiDma_BdClear( CurBdPtr );
+				Status = XAxiDma_BdSetBufAddr( CurBdPtr, ( UINTPTR ) sin_buff );
+				Xil_AssertNonvoid( Status==XST_SUCCESS );
+				Status = XAxiDma_BdSetLength( CurBdPtr, sizeof( sin_buff ), TxRingPtr->MaxTransferLen );
+				Xil_AssertNonvoid( Status==XST_SUCCESS );
+				XAxiDma_BdSetTDest( CurBdPtr, SPEAKER_TDEST );
+				XAxiDma_BdSetCtrl( CurBdPtr, XAXIDMA_BD_CTRL_TXSOF_MASK|XAXIDMA_BD_CTRL_TXEOF_MASK );
+				XAxiDma_BdSetId( CurBdPtr, ( u32 ) sin_buff );
+				XAxiDma_BdSetTUser( CurBdPtr, DMA_TUSER );
+				XAxiDma_BdSetARCache( CurBdPtr, DMA_ARCACHE );
+				XAxiDma_BdSetARUser( CurBdPtr, DMA_ARUSER );
+				XAxiDma_BdSetVSize( CurBdPtr, DMA_VSIZE );
+				XAxiDma_BdSetStride( CurBdPtr, sizeof( sin_buff ) );
+				//XAxiDma_DumpBd( CurBdPtr );
+				CurBdPtr = ( XAxiDma_Bd* ) XAxiDma_BdRingNext( TxRingPtr, CurBdPtr );
+			}
+
+			/* Enable interrupt and make sure interrupt only occurs
+			until a specified number of buffer descriptors have been processed. */
+			dma2device_isready = false;
+			XAxiDma_BdRingIntEnable( TxRingPtr, XAXIDMA_IRQ_IOC_MASK );
+			XAxiDma_BdRingSetCoalesce( TxRingPtr, DMA_INT_BD_TOTAL, 0 );
+
+			/* Bring the buffer descriptors to the hardware for processing. */
+			Status = XAxiDma_BdRingToHw( TxRingPtr, DMA_BD_PER_RING_TOTAL, BdPtr );
+			Xil_AssertNonvoid( Status==XST_SUCCESS );
+		}
+
+		/* Application's main loop starts here. */
+		xil_printf( "Continuously running application...\n\r" );
+		while ( true )
+		{
+			/* Wait until it's time to allocate more
+			buffer descriptors for the DMA. */
+			if ( dma2device_isready==true )
+			{
+				int Status;
+				int AmountFinished;
+				XAxiDma_BdRing* TxRingPtr;
+				XAxiDma_Bd* BdPtr;
+
+				/* Reset the flag used by ISR. */
+				dma2device_isready = false;
+
+				/* Acquire and free buffer descriptors. */
+				TxRingPtr = XAxiDma_GetTxRing( &dma_obj );
+				AmountFinished = XAxiDma_BdRingFromHw( TxRingPtr, DMA_BD_PER_RING_TOTAL, &BdPtr );
+				if ( AmountFinished>0 )
+				{
+					Status = XAxiDma_BdRingFree( TxRingPtr, AmountFinished, BdPtr );
+					Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+					/* Reallocate the buffer descriptors. */
+					Status = XAxiDma_BdRingAlloc( TxRingPtr, AmountFinished, &BdPtr );
+					Xil_AssertNonvoid( Status==XST_SUCCESS );
+
+					/* Bring same buffer descriptors back to the dma. No need to change
+					any of the buffer descriptors. */
+					Status = XAxiDma_BdRingToHw( TxRingPtr, AmountFinished, BdPtr );
+					Xil_AssertNonvoid( Status==XST_SUCCESS );
+				}
+			}
+
+			/* Handle user input. */
+			if ( user_isready==true )
+			{
+				u32 CurrRead, PrevRead;
+
+				user_isready = false;
+
+				CurrRead = XGpio_DiscreteRead( &user_obj, 1 );
+				do
+				{
+					if ( CurrRead&GPIO_USER_SW0_MASK )
+					{
+						XPwm_prepare_Set_enable_flag( &prepare_obj, true );
+					}
+					else
+					{
+						XPwm_prepare_Set_enable_flag( &prepare_obj, false );
+					}
+
+					if ( CurrRead&GPIO_USER_SW1_MASK )
+					{
+						XAwgn_Set_enable( &awgn_obj, true );
+					}
+					else
+					{
+						XAwgn_Set_enable( &awgn_obj, false );
+					}
+
+					{
+						static u32 PrevBTNU = 0;
+						u32 CurrBTNU;
+
+						CurrBTNU = CurrRead&GPIO_USER_BTNU_MASK;
+						if ( CurrBTNU && !PrevBTNU )
+						{
+							u32 shift_val;
+							shift_val = XPwm_prepare_Get_shift_val( &prepare_obj );
+							XPwm_prepare_Set_shift_val( &prepare_obj, ( shift_val-1 ) );
+						}
+						PrevBTNU = CurrBTNU;
+					}
+
+					{
+						static u32 PrevBTND = 0;
+						u32 CurrBTND;
+
+						CurrBTND = CurrRead&GPIO_USER_BTND_MASK;
+						if ( CurrBTND && !PrevBTND )
+						{
+							u32 shift_val;
+							shift_val = XPwm_prepare_Get_shift_val( &prepare_obj );
+							XPwm_prepare_Set_shift_val( &prepare_obj, ( shift_val+1 ) );
+						}
+						PrevBTND = CurrBTND;
+					}
+
+					{
+						static u32 PrevBTNL = 0;
+						u32 CurrBTNL;
+
+						CurrBTNL = CurrRead&GPIO_USER_BTNL_MASK;
+						if ( CurrBTNL && !PrevBTNL )
+						{
+							u32 stdd_val;
+							stdd_val = XAwgn_Get_stdd( &awgn_obj );
+							XAwgn_Set_stdd( &awgn_obj, stdd_val<<1 );
+						}
+						PrevBTNL = CurrBTNL;
+					}
+
+					{
+						static u32 PrevBTNR = 0;
+						u32 CurrBTNR;
+
+						CurrBTNR = CurrRead&GPIO_USER_BTNR_MASK;
+						if ( CurrBTNR && !PrevBTNR )
+						{
+							u32 stdd_val;
+							stdd_val = XAwgn_Get_stdd( &awgn_obj );
+							XAwgn_Set_stdd( &awgn_obj, stdd_val>>1 );
+						}
+						PrevBTNR = CurrBTNR;
+					}
+
+					PrevRead = CurrRead;
+					CurrRead = XGpio_DiscreteRead( &user_obj, 1 );
+				}
+				while ( CurrRead!=PrevRead );
+			}
+		}
+	}
+	return 0;
+}
+
+void Xil_AssertCallbackDef( const char8 *File, s32 Line )
+{
+	xil_printf( "Assertion failed in source %s at line %d...\n\r", File, Line );
+}
+
+void dma_dma2device_isr( void* param )
+{
+	( void ) param;
+	XAxiDma_BdRingAckIrq( XAxiDma_GetTxRing( &dma_obj ), XAXIDMA_IRQ_IOC_MASK );
+	dma2device_isready = true;
+}
+
+void dma_device2dma_isr( void* param )
+{
+	( void ) param;
+	XAxiDma_BdRingAckIrq( XAxiDma_GetRxRing( &dma_obj ), XAXIDMA_IRQ_IOC_MASK );
+	device2dma_isready = true;
+}
+
+void gpio_user_isr( void* param )
+{
+	( void ) param;
+	XGpio_InterruptClear( &user_obj, 1 );
+	user_isready = true;
+}
+

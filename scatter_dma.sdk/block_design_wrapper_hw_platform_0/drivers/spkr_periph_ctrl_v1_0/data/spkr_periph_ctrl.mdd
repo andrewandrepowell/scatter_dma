@@ -1,0 +1,10 @@
+
+
+OPTION psf_version = 2.1;
+
+BEGIN DRIVER spkr_periph_ctrl
+	OPTION supported_peripherals = (spkr_periph_ctrl);
+	OPTION copyfiles = all;
+	OPTION VERSION = 1.0;
+	OPTION NAME = spkr_periph_ctrl;
+END DRIVER

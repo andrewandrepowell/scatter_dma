@@ -1,0 +1,13 @@
+awgn_fadd_32ns_32ns_32_5_full_dsp
+awgn_fmul_32ns_32ns_32_4_max_dsp
+awgn_uitofp_32ns_32_6
+awgn_sitofp_32s_32_6
+awgn_fptrunc_64ns_32_1
+awgn_fpext_32ns_64_1
+awgn_fcmp_32ns_32ns_1_1
+awgn_dmul_64ns_64ns_64_6_max_dsp
+awgn_ddiv_64ns_64ns_64_31
+awgn_dsqrt_64ns_64ns_64_30
+awgn_dlog_64ns_64ns_64_31_full_dsp
+awgn_control_axil_s_axi
+awgn
